@@ -1,0 +1,14 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="recycler_height">48dp</dimen>
+    <dimen name="item_height">@dimen/recycler_height</dimen>
+    <dimen name="item_text">18sp</dimen>
+    <dimen name="large_text">22sp</dimen>
+
+    <!-- Fixed-width -->
+    <dimen name="fixed_item_width">34dp</dimen>
+    <dimen name="fixed_item_padding">12dp</dimen>
+</resources>
