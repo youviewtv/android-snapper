@@ -11,7 +11,7 @@
 
     <com.youview.centresnapsamples.SampleCenterSnapView
         android:id="@+id/recycler"
-        android:layout_width="@dimen/recycler_height"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
     <View
@@ -19,6 +19,12 @@
         android:layout_height="1dp"
         android:background="@android:color/holo_blue_bright"
         android:layout_centerVertical="true" />
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="@android:color/holo_blue_bright"
+        android:layout_centerHorizontal="true" />
 
     <TextView
         android:id="@+id/content"

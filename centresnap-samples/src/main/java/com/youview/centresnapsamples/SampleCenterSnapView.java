@@ -24,6 +24,7 @@
 package com.youview.centresnapsamples;
 
 import android.content.Context;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.AttributeSet;
 
 import com.youview.centresnaprecyclerview.CentreSnapRecyclerView;
@@ -47,8 +48,8 @@ public class SampleCenterSnapView extends CentreSnapRecyclerView {
     @Override
     protected void init() {
         super.init();
-//        mChildWidth = getContext().getResources().getDimensionPixelSize(R.dimen.fixed_item_width);
-        mChildWidth = getContext().getResources().getDimensionPixelSize(R.dimen.item_height);
+        mChildWidth = getContext().getResources().getDimensionPixelSize(R.dimen.fixed_item_width);
+//        mChildWidth = getContext().getResources().getDimensionPixelSize(R.dimen.item_height);
     }
 
     public void setOnSelectionChangedListener(OnSelectionChangedListener<String> listener) {
@@ -62,7 +63,12 @@ public class SampleCenterSnapView extends CentreSnapRecyclerView {
     }
 
     @Override
-    protected int getChildHeight() {
+    protected int getOrientation() {
+        return LinearLayoutManager.HORIZONTAL;
+    }
+
+    @Override
+    protected int getChildDimen() {
         return mChildWidth;
     }
 }

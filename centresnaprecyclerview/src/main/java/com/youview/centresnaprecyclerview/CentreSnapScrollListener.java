@@ -52,21 +52,41 @@ public class CentreSnapScrollListener extends RecyclerView.OnScrollListener {
             int childPosition = recyclerView.getChildLayoutPosition(centreChild);
             adapter.onItemSelected(childPosition);
 
-            int top = centreChild.getTop();
-            int bottom = centreChild.getBottom();
-            int topFromCentre = centreY - top;
-            int bottomFromCentre = bottom - centreY;
-            int delta = (bottomFromCentre - topFromCentre) / 2;
-
+            int delta = calculateDelta(recyclerView, centreChild, centreX, centreY);
             // Avoid infinite scrolls where the parity of the screen width and the view width are
             // different.
             if (Math.abs(delta) > SNAP_THRESHOLD_PIXELS) {
-                recyclerView.smoothScrollBy(0, delta);
+                recyclerView.smoothScrollBy(delta, delta);
             }
         } else {
             super.onScrollStateChanged(recyclerView, newState);
         }
 
         mPreviousScrollState = newState;
+    }
+
+    /**
+     * <p>TODO</p>
+     * @param recyclerView
+     * @param centreChild
+     * @return
+     */
+    private int calculateDelta(RecyclerView recyclerView, View centreChild, int centreX, int centreY) {
+        boolean isHorizontal = ((CentreSnapRecyclerView) recyclerView).getOrientation() == RecyclerView.HORIZONTAL;
+        // Start is the side closest to 0 scroll (i.e. left or top), end is the appropriate opposite.
+        int startFromCentre, endFromCentre;
+        if (isHorizontal) {
+            int left = centreChild.getLeft();
+            int right = centreChild.getRight();
+            startFromCentre = centreX - left;
+            endFromCentre = right - centreX;
+        } else {
+            int top = centreChild.getTop();
+            int bottom = centreChild.getBottom();
+            startFromCentre = centreY - top;
+            endFromCentre = bottom - centreY;
+        }
+
+        return (endFromCentre - startFromCentre) / 2;
     }
 }

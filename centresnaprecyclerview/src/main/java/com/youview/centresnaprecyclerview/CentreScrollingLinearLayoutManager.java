@@ -42,9 +42,25 @@ public class CentreScrollingLinearLayoutManager extends LinearLayoutManager {
     // We guard against centre-align scrolls happening before we've been updated about the new
     // sizes, though this shouldn't happen.
     private boolean mMeasurementsValid;
-    private int mHeight;
-    private int mChildHeight;
 
+    /**
+     * <p>The relevant dimension (width/height for horizontal/vertical) of the appropriate
+     * {@link CentreSnapRecyclerView}.</p>
+     */
+    private int mDimen;
+
+    /**
+     * <p>The relevant dimension (width/height for horizontal/vertical) of each child in the
+     * appropriate {@link CentreSnapRecyclerView}.</p>
+     */
+    private int mChildDimen;
+
+    /**
+     * <p>TODO</p>
+     * @param context
+     * @param orientation
+     * @param reverseLayout
+     */
     public CentreScrollingLinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
         super(context, orientation, reverseLayout);
     }
@@ -62,7 +78,7 @@ public class CentreScrollingLinearLayoutManager extends LinearLayoutManager {
     @Override
     public void scrollToPosition(int position) {
         if (mMeasurementsValid) {
-            int centreOffset = (mHeight - mChildHeight) / 2;
+            int centreOffset = (mDimen - mChildDimen) / 2;
             super.scrollToPositionWithOffset(position, centreOffset);
         } else {
             super.scrollToPosition(position);
@@ -81,7 +97,7 @@ public class CentreScrollingLinearLayoutManager extends LinearLayoutManager {
      *     <li>
      *         <strong>Approximation</strong>
      *         <p>If no such {@link View} can be found (usually because the {@code recyclerView} has
-     *         not yet been laid out), we use our average {@link #mChildHeight} to work out where the
+     *         not yet been laid out), we use our average {@link #mChildDimen} to work out where the
      *         child at {@code position} should be. Given the children can and do vary substantially
      *         in width, this can be slightly off.</p>
      *     </li>
@@ -99,12 +115,11 @@ public class CentreScrollingLinearLayoutManager extends LinearLayoutManager {
     public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, int position) {
         View newCentreChild = findViewByPosition(position);
         if (newCentreChild != null) {
-            int currentTop = newCentreChild.getTop();
-            int newTop = (mHeight - newCentreChild.getMeasuredHeight()) / 2;
-            int offset = currentTop - newTop;
-            recyclerView.smoothScrollBy(offset, 0);
+            int offset = calculateOffset(newCentreChild);
+            // Pass offset into both x and y as the orientation will ensure one is trimmed to 0.
+            recyclerView.smoothScrollBy(offset, offset);
         } else if (mMeasurementsValid) {
-            int centreOffset = (mHeight - mChildHeight) / 2;
+            int centreOffset = (mDimen - mChildDimen) / 2;
             super.scrollToPositionWithOffset(position, centreOffset);
         } else {
             super.scrollToPosition(position);
@@ -112,15 +127,34 @@ public class CentreScrollingLinearLayoutManager extends LinearLayoutManager {
     }
 
     /**
+     * <p>TODO</p>
+     * @param child
+     * @return
+     */
+    private int calculateOffset(View child) {
+        boolean isHorizontal = getOrientation() == HORIZONTAL;
+        int currentOffset, necessaryOffset;
+        if (isHorizontal) {
+            currentOffset = child.getLeft();
+            necessaryOffset = (mDimen - child.getMeasuredWidth()) / 2;
+        } else {
+            currentOffset = child.getTop();
+            necessaryOffset = (mDimen - child.getMeasuredHeight()) / 2;
+        }
+
+        return currentOffset - necessaryOffset;
+    }
+
+    /**
      * <p>Informs this {@code LayoutManager} of new measurements, allowing it to perform
      * measurement-aware scrolls correctly.</p>
      *
-     * @param height The height of the associated {@link RecyclerView}.
-     * @param childHeight The height of each child {@link View} in the {@code RecyclerView}.
+     * @param dimen The height of the associated {@link RecyclerView}. TODO
+     * @param childDimen The height of each child {@link View} in the {@code RecyclerView}. TODO
      */
-    public void setNewMeasurements(int height, int childHeight) {
-        mHeight = height;
-        mChildHeight = childHeight;
+    public void setNewMeasurements(int dimen, int childDimen) {
+        mDimen = dimen;
+        mChildDimen = childDimen;
         mMeasurementsValid = true;
     }
 }

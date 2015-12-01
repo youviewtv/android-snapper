@@ -33,14 +33,14 @@ import android.view.View;
 /**
  * <p>Abstract implementation of a {@link RecyclerView} that provides <i>most</i> of the work for
  * a centre-aligned and centre-snapping {@code RecyclerView}. Sub-classes must implement
- * {@link #getChildHeight()} to provide the width of child {@code View}s, as the behaviours
+ * {@link #getChildDimen()} to provide the width of child {@code View}s, as the behaviours
  * that make centring possible are very measurement-aware.</p>
  */
 public abstract class CentreSnapRecyclerView extends RecyclerView {
     CentreScrollingLinearLayoutManager mLayoutManager;
 
     // State variables
-    private int mMeasuredHeight;
+    private int mMeasuredDimen;  // TODO /**  */
     private boolean mMeasurementsValid;
 
     public CentreSnapRecyclerView(Context context) {
@@ -62,7 +62,7 @@ public abstract class CentreSnapRecyclerView extends RecyclerView {
      * <p>Sets up initial state of this {@code RecyclerView}.</p>
      */
     protected void init() {
-        mLayoutManager = new CentreScrollingLinearLayoutManager(getContext(), VERTICAL, false);
+        mLayoutManager = new CentreScrollingLinearLayoutManager(getContext(), getOrientation(), false);
         setLayoutManager(mLayoutManager);
         addOnScrollListener(new CentreSnapScrollListener());
 
@@ -73,13 +73,19 @@ public abstract class CentreSnapRecyclerView extends RecyclerView {
     }
 
     /**
+     * <p>TODO</p>
+     * @return
+     */
+    protected abstract int getOrientation();
+
+    /**
      * <p>Implementation-specific method to retrieve the width of each child shown in this
      * {@link RecyclerView}. Fixed-width works best, but if there is a marginal variance in width,
      * an average tends to do the trick.</p>
      *
      * @return The width (fixed or average) of children of this {@link RecyclerView}.
      */
-    protected abstract int getChildHeight();
+    protected abstract int getChildDimen();
 
     /**
      * <p>Provides a {@link RecyclerView.ItemDecoration} that gets added by default to this
@@ -95,13 +101,16 @@ public abstract class CentreSnapRecyclerView extends RecyclerView {
         return new ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, State state) {
-                int parentHeight = parent.getHeight();
-                int spacingSize = (parentHeight - getChildHeight()) / 2;
+                boolean isHorizontal = getOrientation() == HORIZONTAL;
+                int parentDimen = isHorizontal ? parent.getWidth() : parent.getHeight();
+                int spacingSize = (parentDimen - getChildDimen()) / 2;
                 int position = parent.getChildAdapterPosition(view);
                 if (position == 0) {
-                    outRect.top = spacingSize;
+                    outRect.left = isHorizontal ? spacingSize : 0;
+                    outRect.top = !isHorizontal ? spacingSize : 0;
                 } else if (position == parent.getAdapter().getItemCount() - 1) {
-                    outRect.bottom = spacingSize;
+                    outRect.right = isHorizontal ? spacingSize : 0;
+                    outRect.bottom = !isHorizontal ? spacingSize : 0;
                 }
             }
         };
@@ -116,15 +125,15 @@ public abstract class CentreSnapRecyclerView extends RecyclerView {
     @Override
     protected void onMeasure(int widthSpec, int heightSpec) {
         super.onMeasure(widthSpec, heightSpec);
-        int measuredHeight = getMeasuredHeight();
-        if (measuredHeight != mMeasuredHeight) {
-            mMeasuredHeight = measuredHeight;
+        int measuredDimen = getOrientation() == HORIZONTAL ? getMeasuredWidth() : getMeasuredHeight();
+        if (measuredDimen != mMeasuredDimen) {
+            mMeasuredDimen = measuredDimen;
             mMeasurementsValid = false;
         }
 
         // Guard code that is potentially expensive.
         if (!mMeasurementsValid) {
-            onMeasurementsUpdated(mMeasuredHeight);
+            onMeasurementsUpdated(mMeasuredDimen);
             if (!mMeasurementsValid) {
                 // If the private mMeasurementsValid field hasn't been toggled, the sub-class didn't
                 // call super.onMeasurementsUpdated.
@@ -141,12 +150,12 @@ public abstract class CentreSnapRecyclerView extends RecyclerView {
      * sub-class <i>must</i> call this super-method, else a {@link RuntimeException} will be
      * thrown.</p>
      *
-     * @param newHeight The new measured width of this {@link CentreSnapRecyclerView}.
+     * @param newDimen The new measured width of this {@link CentreSnapRecyclerView}.
      */
-    protected void onMeasurementsUpdated(int newHeight) {
+    protected void onMeasurementsUpdated(int newDimen) {
         mMeasurementsValid = true;
-        int childHeight = getChildHeight();
-        mLayoutManager.setNewMeasurements(newHeight, childHeight);
+        int childDimen = getChildDimen();
+        mLayoutManager.setNewMeasurements(newDimen, childDimen);
     }
 
     /**
