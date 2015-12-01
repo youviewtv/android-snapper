@@ -33,14 +33,14 @@ import android.view.View;
 /**
  * <p>Abstract implementation of a {@link RecyclerView} that provides <i>most</i> of the work for
  * a centre-aligned and centre-snapping {@code RecyclerView}. Sub-classes must implement
- * {@link #getChildWidth()} to provide the width of child {@code View}s, as the behaviours
+ * {@link #getChildHeight()} to provide the width of child {@code View}s, as the behaviours
  * that make centring possible are very measurement-aware.</p>
  */
 public abstract class CentreSnapRecyclerView extends RecyclerView {
     CentreScrollingLinearLayoutManager mLayoutManager;
 
     // State variables
-    private int mMeasuredWidth;
+    private int mMeasuredHeight;
     private boolean mMeasurementsValid;
 
     public CentreSnapRecyclerView(Context context) {
@@ -62,7 +62,7 @@ public abstract class CentreSnapRecyclerView extends RecyclerView {
      * <p>Sets up initial state of this {@code RecyclerView}.</p>
      */
     protected void init() {
-        mLayoutManager = new CentreScrollingLinearLayoutManager(getContext(), HORIZONTAL, false);
+        mLayoutManager = new CentreScrollingLinearLayoutManager(getContext(), VERTICAL, false);
         setLayoutManager(mLayoutManager);
         addOnScrollListener(new CentreSnapScrollListener());
 
@@ -79,7 +79,7 @@ public abstract class CentreSnapRecyclerView extends RecyclerView {
      *
      * @return The width (fixed or average) of children of this {@link RecyclerView}.
      */
-    protected abstract int getChildWidth();
+    protected abstract int getChildHeight();
 
     /**
      * <p>Provides a {@link RecyclerView.ItemDecoration} that gets added by default to this
@@ -95,13 +95,13 @@ public abstract class CentreSnapRecyclerView extends RecyclerView {
         return new ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, State state) {
-                int parentWidth = parent.getWidth();
-                int spacingSize = (parentWidth - getChildWidth()) / 2;
+                int parentHeight = parent.getHeight();
+                int spacingSize = (parentHeight - getChildHeight()) / 2;
                 int position = parent.getChildAdapterPosition(view);
                 if (position == 0) {
-                    outRect.left = spacingSize;
+                    outRect.top = spacingSize;
                 } else if (position == parent.getAdapter().getItemCount() - 1) {
-                    outRect.right = spacingSize;
+                    outRect.bottom = spacingSize;
                 }
             }
         };
@@ -116,15 +116,15 @@ public abstract class CentreSnapRecyclerView extends RecyclerView {
     @Override
     protected void onMeasure(int widthSpec, int heightSpec) {
         super.onMeasure(widthSpec, heightSpec);
-        int measuredWidth = getMeasuredWidth();
-        if (measuredWidth != mMeasuredWidth) {
-            mMeasuredWidth = measuredWidth;
+        int measuredHeight = getMeasuredHeight();
+        if (measuredHeight != mMeasuredHeight) {
+            mMeasuredHeight = measuredHeight;
             mMeasurementsValid = false;
         }
 
         // Guard code that is potentially expensive.
         if (!mMeasurementsValid) {
-            onMeasurementsUpdated(mMeasuredWidth);
+            onMeasurementsUpdated(mMeasuredHeight);
             if (!mMeasurementsValid) {
                 // If the private mMeasurementsValid field hasn't been toggled, the sub-class didn't
                 // call super.onMeasurementsUpdated.
@@ -141,12 +141,12 @@ public abstract class CentreSnapRecyclerView extends RecyclerView {
      * sub-class <i>must</i> call this super-method, else a {@link RuntimeException} will be
      * thrown.</p>
      *
-     * @param newWidth The new measured width of this {@link CentreSnapRecyclerView}.
+     * @param newHeight The new measured width of this {@link CentreSnapRecyclerView}.
      */
-    protected void onMeasurementsUpdated(int newWidth) {
+    protected void onMeasurementsUpdated(int newHeight) {
         mMeasurementsValid = true;
-        int childWidth = getChildWidth();
-        mLayoutManager.setNewMeasurements(newWidth, childWidth);
+        int childHeight = getChildHeight();
+        mLayoutManager.setNewMeasurements(newHeight, childHeight);
     }
 
     /**

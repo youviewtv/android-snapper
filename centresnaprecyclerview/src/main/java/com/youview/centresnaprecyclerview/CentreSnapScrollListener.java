@@ -52,16 +52,16 @@ public class CentreSnapScrollListener extends RecyclerView.OnScrollListener {
             int childPosition = recyclerView.getChildLayoutPosition(centreChild);
             adapter.onItemSelected(childPosition);
 
-            int left = centreChild.getLeft();
-            int right = centreChild.getRight();
-            int leftFromCentre = centreX - left;
-            int rightFromCentre = right - centreX;
-            int delta = (rightFromCentre - leftFromCentre) / 2;
+            int top = centreChild.getTop();
+            int bottom = centreChild.getBottom();
+            int topFromCentre = centreY - top;
+            int bottomFromCentre = bottom - centreY;
+            int delta = (bottomFromCentre - topFromCentre) / 2;
 
             // Avoid infinite scrolls where the parity of the screen width and the view width are
             // different.
             if (Math.abs(delta) > SNAP_THRESHOLD_PIXELS) {
-                recyclerView.smoothScrollBy(delta, 0);
+                recyclerView.smoothScrollBy(0, delta);
             }
         } else {
             super.onScrollStateChanged(recyclerView, newState);

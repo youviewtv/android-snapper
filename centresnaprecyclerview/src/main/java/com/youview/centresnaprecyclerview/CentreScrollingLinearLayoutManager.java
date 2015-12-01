@@ -42,8 +42,8 @@ public class CentreScrollingLinearLayoutManager extends LinearLayoutManager {
     // We guard against centre-align scrolls happening before we've been updated about the new
     // sizes, though this shouldn't happen.
     private boolean mMeasurementsValid;
-    private int mWidth;
-    private int mChildWidth;
+    private int mHeight;
+    private int mChildHeight;
 
     public CentreScrollingLinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
         super(context, orientation, reverseLayout);
@@ -62,7 +62,7 @@ public class CentreScrollingLinearLayoutManager extends LinearLayoutManager {
     @Override
     public void scrollToPosition(int position) {
         if (mMeasurementsValid) {
-            int centreOffset = (mWidth - mChildWidth) / 2;
+            int centreOffset = (mHeight - mChildHeight) / 2;
             super.scrollToPositionWithOffset(position, centreOffset);
         } else {
             super.scrollToPosition(position);
@@ -81,7 +81,7 @@ public class CentreScrollingLinearLayoutManager extends LinearLayoutManager {
      *     <li>
      *         <strong>Approximation</strong>
      *         <p>If no such {@link View} can be found (usually because the {@code recyclerView} has
-     *         not yet been laid out), we use our average {@link #mChildWidth} to work out where the
+     *         not yet been laid out), we use our average {@link #mChildHeight} to work out where the
      *         child at {@code position} should be. Given the children can and do vary substantially
      *         in width, this can be slightly off.</p>
      *     </li>
@@ -99,12 +99,12 @@ public class CentreScrollingLinearLayoutManager extends LinearLayoutManager {
     public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, int position) {
         View newCentreChild = findViewByPosition(position);
         if (newCentreChild != null) {
-            int currentLeft = newCentreChild.getLeft();
-            int newLeft = (mWidth - newCentreChild.getMeasuredWidth()) / 2;
-            int offset = currentLeft - newLeft;
+            int currentTop = newCentreChild.getTop();
+            int newTop = (mHeight - newCentreChild.getMeasuredHeight()) / 2;
+            int offset = currentTop - newTop;
             recyclerView.smoothScrollBy(offset, 0);
         } else if (mMeasurementsValid) {
-            int centreOffset = (mWidth - mChildWidth) / 2;
+            int centreOffset = (mHeight - mChildHeight) / 2;
             super.scrollToPositionWithOffset(position, centreOffset);
         } else {
             super.scrollToPosition(position);
@@ -112,23 +112,15 @@ public class CentreScrollingLinearLayoutManager extends LinearLayoutManager {
     }
 
     /**
-     * <p>Informs this {@code LayoutManager} that its stored measurements are no longer valid, and
-     * measurement-aware scrolls cannot be relied upon.</p>
-     */
-    public void invalidateMeasurements() {
-        mMeasurementsValid = false;
-    }
-
-    /**
      * <p>Informs this {@code LayoutManager} of new measurements, allowing it to perform
      * measurement-aware scrolls correctly.</p>
      *
-     * @param width The width of the associated {@link RecyclerView}.
-     * @param childWidth The width of each child {@link View} in the {@code RecyclerView}.
+     * @param height The height of the associated {@link RecyclerView}.
+     * @param childHeight The height of each child {@link View} in the {@code RecyclerView}.
      */
-    public void setNewMeasurements(int width, int childWidth) {
-        mWidth = width;
-        mChildWidth = childWidth;
+    public void setNewMeasurements(int height, int childHeight) {
+        mHeight = height;
+        mChildHeight = childHeight;
         mMeasurementsValid = true;
     }
 }

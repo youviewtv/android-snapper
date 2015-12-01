@@ -47,7 +47,8 @@ public class SampleCenterSnapView extends CentreSnapRecyclerView {
     @Override
     protected void init() {
         super.init();
-        mChildWidth = getContext().getResources().getDimensionPixelSize(R.dimen.fixed_item_width);
+//        mChildWidth = getContext().getResources().getDimensionPixelSize(R.dimen.fixed_item_width);
+        mChildWidth = getContext().getResources().getDimensionPixelSize(R.dimen.item_height);
     }
 
     public void setOnSelectionChangedListener(OnSelectionChangedListener<String> listener) {
@@ -61,7 +62,7 @@ public class SampleCenterSnapView extends CentreSnapRecyclerView {
     }
 
     @Override
-    protected int getChildWidth() {
+    protected int getChildHeight() {
         return mChildWidth;
     }
 }
