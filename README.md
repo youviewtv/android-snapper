@@ -19,6 +19,8 @@ Android-snapper comes with a single sample app (under the `samples` package) whi
 
 ### License
 ```
+The MIT License (MIT)
+
 Copyright (c) 2016 YouView TV Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
