@@ -24,7 +24,6 @@
 package com.youview.centresnaprecyclerview;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -86,7 +85,6 @@ public abstract class CentreSnapRecyclerView extends RecyclerView {
      * <p>Provides a {@link RecyclerView.ItemDecoration} that gets added by default to this
      * {@code CentreSnapRecyclerView}. This base implementation creates empty space at the beginning
      * and end of the view such that the first and last elements can reach the centre.</p>
-     *
      * <p>It is safe to return {@code null} from this method if this is not desired.</p>
      *
      * @return An {@link RecyclerView.ItemDecoration} that adds empty space to the start and end of
@@ -121,15 +119,34 @@ public abstract class CentreSnapRecyclerView extends RecyclerView {
         int measuredWidth = getMeasuredWidth();
         if (measuredWidth != mMeasuredWidth) {
             mMeasuredWidth = measuredWidth;
-            onWidthChanged();
+            mMeasurementsValid = false;
         }
 
         // Guard code that is potentially expensive.
         if (!mMeasurementsValid) {
-            mMeasurementsValid = true;
-            int childWidth = getChildWidth();
-            mLayoutManager.setNewMeasurements(mMeasuredWidth, childWidth);
+            onMeasurementsUpdated(mMeasuredWidth);
+            if (!mMeasurementsValid) {
+                // If the private mMeasurementsValid field hasn't been toggled, the sub-class didn't
+                // call super.onMeasurementsUpdated.
+                throw new RuntimeException("Sub-class did not call through to" +
+                        "super.onMeasurementsUpdated()");
+            }
         }
+    }
+
+    /**
+     * <p>Responds to a change in measurements, resetting state and updating the
+     * {@link CentreScrollingLinearLayoutManager}.</p>
+     * <p>This method can be overridden to add more measurement-aware behaviour, but if so the
+     * sub-class <i>must</i> call this super-method, else a {@link RuntimeException} will be
+     * thrown.</p>
+     *
+     * @param newWidth The new measured width of this {@link CentreSnapRecyclerView}.
+     */
+    protected void onMeasurementsUpdated(int newWidth) {
+        mMeasurementsValid = true;
+        int childWidth = getChildWidth();
+        mLayoutManager.setNewMeasurements(newWidth, childWidth);
     }
 
     /**
@@ -152,14 +169,6 @@ public abstract class CentreSnapRecyclerView extends RecyclerView {
     public void scrollToPosition(int position) {
         // Our scrolling algorithm means all scrolls are smooth.
         smoothScrollToPosition(position);
-    }
-
-    /**
-     * <p>Responds to a change in dimensions and resets state variables as appropriate.</p>
-     */
-    private void onWidthChanged() {
-        mMeasurementsValid = false;
-        mLayoutManager.invalidateMeasurements();
     }
 
     /**
