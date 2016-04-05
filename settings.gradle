@@ -1,2 +1,2 @@
-include ':centresnaprecyclerview',
-        ':centresnap-samples'
+include ':snapper',
+        ':snapper-samples'
