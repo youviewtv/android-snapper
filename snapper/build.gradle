@@ -1,11 +1,16 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
+
+ext {
+    PUBLISH_GROUP_ID = 'com.youview'
+    PUBLISH_ARTIFACT_ID = 'snapper'
+    PUBLISH_VERSION = '1.0.0'
+}
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "com.youview.centresnapsamples"
         minSdkVersion 15
         targetSdkVersion 23
         versionCode 1
@@ -21,6 +26,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:23.0.1'
-    compile project(':centresnaprecyclerview')
+    compile 'com.android.support:recyclerview-v7:23.1.1'
 }
+
+apply from: 'jcenter.gradle'
