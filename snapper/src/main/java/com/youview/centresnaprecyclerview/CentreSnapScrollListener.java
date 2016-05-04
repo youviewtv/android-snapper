@@ -38,35 +38,45 @@ public class CentreSnapScrollListener extends RecyclerView.OnScrollListener {
     /**
      * {@inheritDoc}
      * <p>Once a scroll has finished (i.e. {@code newState} <i>becomes</i>
-     * {@link RecyclerView#SCROLL_STATE_IDLE}), calculates the delta between the centre of the
-     * RecyclerView and the centre child view, and scrolls by that amount to centre the child.</p>
+     * {@link RecyclerView#SCROLL_STATE_IDLE}), calls through to
+     * {@link #onScrollCompleted(RecyclerView)}.</p>
      */
     @Override
     public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
         if (newState == RecyclerView.SCROLL_STATE_IDLE && newState != mPreviousScrollState) {
-            int centreX = recyclerView.getWidth() / 2;
-            int centreY = recyclerView.getHeight() / 2;
-            View centreChild = recyclerView.findChildViewUnder(centreX, centreY);
-
-            SnapRecyclerAdapter adapter = (SnapRecyclerAdapter) recyclerView.getAdapter();
-            int childPosition = recyclerView.getChildLayoutPosition(centreChild);
-            adapter.onItemSelected(childPosition);
-
-            int left = centreChild.getLeft();
-            int right = centreChild.getRight();
-            int leftFromCentre = centreX - left;
-            int rightFromCentre = right - centreX;
-            int delta = (rightFromCentre - leftFromCentre) / 2;
-
-            // Avoid infinite scrolls where the parity of the screen width and the view width are
-            // different.
-            if (Math.abs(delta) > SNAP_THRESHOLD_PIXELS) {
-                recyclerView.smoothScrollBy(delta, 0);
-            }
+            onScrollCompleted(recyclerView);
         } else {
             super.onScrollStateChanged(recyclerView, newState);
         }
 
         mPreviousScrollState = newState;
+    }
+
+    /**
+     * <p>Calculates the delta between the centre of the {@link RecyclerView} and the centre child
+     * view, and scrolls by that amount to centre the child</p>
+     *
+     * @param recyclerView The {@link RecyclerView} that has completed its scroll.
+     */
+    protected void onScrollCompleted(RecyclerView recyclerView) {
+        int centreX = recyclerView.getWidth() / 2;
+        int centreY = recyclerView.getHeight() / 2;
+        View centreChild = recyclerView.findChildViewUnder(centreX, centreY);
+
+        SnapRecyclerAdapter adapter = (SnapRecyclerAdapter) recyclerView.getAdapter();
+        int childPosition = recyclerView.getChildLayoutPosition(centreChild);
+        adapter.onItemSelected(childPosition);
+
+        int left = centreChild.getLeft();
+        int right = centreChild.getRight();
+        int leftFromCentre = centreX - left;
+        int rightFromCentre = right - centreX;
+        int delta = (rightFromCentre - leftFromCentre) / 2;
+
+        // Avoid infinite scrolls where the parity of the screen width and the view width are
+        // different.
+        if (Math.abs(delta) > SNAP_THRESHOLD_PIXELS) {
+            recyclerView.smoothScrollBy(delta, 0);
+        }
     }
 }
