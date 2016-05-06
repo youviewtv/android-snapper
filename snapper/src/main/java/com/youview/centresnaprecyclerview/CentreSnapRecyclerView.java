@@ -64,7 +64,7 @@ public abstract class CentreSnapRecyclerView extends RecyclerView {
     protected void init() {
         mLayoutManager = new CentreScrollingLinearLayoutManager(getContext(), HORIZONTAL, false);
         setLayoutManager(mLayoutManager);
-        addOnScrollListener(new CentreSnapScrollListener());
+        addOnScrollListener(createScrollListener());
 
         ItemDecoration defaultItemDecoration = getDefaultItemDecoration();
         if (defaultItemDecoration != null) {
@@ -105,6 +105,16 @@ public abstract class CentreSnapRecyclerView extends RecyclerView {
                 }
             }
         };
+    }
+
+    /**
+     * <p>Specifies a {@link CentreSnapScrollListener} to use with this
+     * {@link CentreSnapRecyclerView}. By default uses the base implementation.</p>
+     *
+     * @return The {@link CentreSnapScrollListener} to use.
+     */
+    protected CentreSnapScrollListener createScrollListener() {
+        return new CentreSnapScrollListener();
     }
 
     /**

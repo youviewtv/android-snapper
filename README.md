@@ -8,11 +8,16 @@ Since `Gallery` was deprecated, there has not been a simple or clean implementat
 ### Usage
 You will need to subclass `CentreSnapRecyclerView`, which provides the abstract method `getChildWidth()`. This should return the width of each child `View` in the `RecyclerView`, as this is used in scrolling and snapping calculations. The `CentreSnapRecyclerView` should be provided with a subclass of `SnapRecyclerAdapter`, which is a `RecyclerView.Adapter` customised to work with Android-snapper.
 
+Android-snapper is available through Gradle both on JCenter and Maven Central:
+```
+compile 'com.youview:snapper:1.1.0'
+```
+
 ### Sample
 Android-snapper comes with a single sample app (under the `samples` package) which shows how to use the Android-snapper view.
 
 ### Version
-1.0.0
+1.1.0
 
 ### Future work
  - Add vertical support.
